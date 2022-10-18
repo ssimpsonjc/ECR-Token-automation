@@ -1,8 +1,18 @@
-ACCOUNT=$(aws sts get-caller-identity --query 'Account' --output text) #aws account number
-REGION=us-west-2                                     #aws ECR region
-SECRET_NAME=${REGION}-ecr-registry                    #secret_name
-EMAIL=abc@xyz.com                                     #can be anything
+#!/bin/bash
 
+# aws account number
+ACCOUNT=$(aws sts get-caller-identity --query 'Account' --output text)
+
+# aws ECR region
+REGION=us-west-2
+
+# Kubernetes secret name
+SECRET_NAME=${REGION}-ecr-registry
+
+# Get real email
+EMAIL=`grep email ~/.gitconfig | cut -d= -f2 | xargs`
+
+# Get AWS Token
 TOKEN=`aws ecr --region=$REGION get-authorization-token --output text --query authorizationData | cut -f1 | base64 -d | cut -d: -f2`
 
 kubectl delete secret --ignore-not-found $SECRET_NAME
